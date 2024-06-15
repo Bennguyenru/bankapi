@@ -1,6 +1,0 @@
-django
-djangorestframework
-corsheaders
-flask
-requests
-djangorestframework-simplejwt

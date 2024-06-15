@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Account Details</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        background-color: #f2f2f2;
+        padding: 20px;
+        border: 1px solid #ddd;
+        margin: 20px;
+        display: inline-block;
+        width: fit-content;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+      }
+      .account-details {
+        margin-bottom: 20px;
+      }
+      .account-details label {
+        display: block;
+      }
+      .account-details p {
+        margin: 5px 0;
+      }
+      button {
+        background-color: #f2f2f2;
+        color: black;
+        padding: 10px 20px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+      }
+      button:hover {
+        background-color: #ddd;
+      }
+      label {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" style="align-self: flex-start;">
+      <h1>Account Details</h1>
+      <br><br><br>
+      <div class="account-details">
+        <label for="account_number" style="display: inline;">Account Number:</label>
+        <p style="display: inline;">{{account_details.account_number}}</p>
+        <br><br>
+        <label for="balance" style="display: inline;">Balance:</label>
+        <p style="display: inline;">{{account_details.balance}} $</p>
+        <br><br>
+        <label for="date_created" style="display: inline;">Date Created:</label>
+        <p style="display: inline;">{{account_details.date_created}}</p>
+        <br><br>
+        <label for="bank_name" style="display: inline;">Bank Name:</label>
+        <p style="display: inline;">{{bank_name}}</p>
+        <br><br>
+        <label for="account_id" style="display: inline;">Account ID:</label>
+        <p style="display: inline;">{{account_details.account_id}}</p>
+        <br><br>
+      </div>
+    </div>
+
+    <div class="container" style="position: absolute;top: 0;right: 0;">
+      <h1>Pending Transactions</h1>
+      <br><br><br>
+      <div class="pending-list">
+        {% for transaction in pendinglist %} 
+          <div class="transaction" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+            <label for="transaction_id" style="display: inline;">Transaction ID:</label>
+            <p style="display: inline;">{{transaction.transaction_id}}</p>
+            <br><br>
+            <label for="amount" style="display: inline;">Amount:</label>
+            <p style="display: inline;">{{transaction.amount}}</p>
+            <br><br>
+            <label for="date_created" style="display: inline;">Date Created:</label>
+            <p style="display: inline;">{{transaction.timestamp}}</p>
+            <br><br>
+            <label for="transaction_type" style="display: inline;">Transaction Type:</label>
+            <p style="display: inline;">{{transaction.transaction_type}}</p>
+            <br><br>
+          </div>
+        {% endfor %} 
+      </div>
+    </div>
+
+    <div class="container" style="position: absolute;top: 0;left: 45%; transform: translateX(-50%); width: fit-content; padding: 10px;">
+      <button type="submit" style="position: relative; left: 0;top: 0;">Deposit</button>
+      <button type="submit" style="position: relative; left: 0;top: 0; ">Withdrawal</button>
+    </div>
+      <script>
+        document.querySelectorAll('button').forEach(button => {
+          button.addEventListener('click', e => {
+            var errorDiv = document.getElementById('error');
+            if (errorDiv) {
+              errorDiv.remove();
+            }
+            var form = document.createElement('form');
+            form.style.position = 'absolute';
+            form.style.top = '50%';
+            form.style.left = '50%';
+            form.style.transform = 'translateX(-50%)';
+            form.style.width = 'fit-content';
+            form.style.padding = '10px';
+            form.style.border = '1px solid #ddd';
+            form.style.boxShadow = '0 4px 8px 0 rgba(0,0,0,0.2)';
+            form.style.background = '#f9f9f9';
+            form.style.display = 'flex';
+            form.style.flexDirection = 'column';
+            form.style.alignItems = 'center';
+            form.style['-webkit-box-align'] = 'center';
+            form.style['-moz-box-align'] = 'center';
+            form.style['-ms-flex-align'] = 'center';
+            form.style['-o-box-align'] = 'center';
+            form.style['-ms-grid-row-align'] = 'center';
+            form.style['-webkit-box-pack'] = 'center';
+            form.style['-moz-box-pack'] = 'center';
+            form.style['-ms-flex-pack'] = 'center';
+            form.style['-o-box-pack'] = 'center';
+            form.style['-ms-grid-row-pack'] = 'center';
+            form.innerHTML = `
+              <div class="form-group" style="display: flex; justify-content: center; align-items: center;">
+                <label for="amount" style="display: inline-block; width: 100px; font-weight: bold;">Amount:</label>
+                <input type="text" id="amount" name="amount" required style="display: inline-block; width: calc(100% - 100px); padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+              </div>
+              <button type="submit" style="width: calc(100% - 100px); padding: 10px 20px; margin: 8px 0; border: none; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);">Submit</button>
+            `;
+            document.body.appendChild(form);
+
+            form.addEventListener('submit', e => {
+              e.preventDefault();
+              var amount = document.querySelector('#amount').value;
+              var url = 'http://localhost:8000/transactions/';
+              var data = {
+                'amount': amount,
+                'transaction_type': button.textContent,
+                'account_id': '{{account_details.account_id}}'
+              };
+              var xhr = new XMLHttpRequest();
+              xhr.open('PUT', url);
+              xhr.setRequestHeader('Content-Type', 'application/json');
+              xhr.send(JSON.stringify(data));
+              xhr.onload = function() {
+                document.querySelector('form').remove();
+                if (xhr.status === 200) {
+                  console.log(xhr.responseText);
+                  var pendingTransactions = document.querySelector('.pending-list');
+                  var transaction = JSON.parse(xhr.responseText);
+                  var transactionHTML = `
+                        <div class="transaction" style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+                            <label for="transaction_id" style="display: inline;">Transaction ID:</label>
+                            <p style="display: inline;">${transaction.transaction_id}</p>
+                            <br><br>
+                            <label for="amount" style="display: inline;">Amount:</label>
+                            <p style="display: inline;">${transaction.amount}</p>
+                            <br><br>
+                            <label for="date_created" style="display: inline;">Date Created:</label>
+                            <p style="display: inline;">${transaction.timestamp}</p>
+                            <br><br>
+                            <label for="transaction_type" style="display: inline;">Transaction Type:</label>
+                            <p style="display: inline;">${transaction.transaction_type}</p>
+                            <br><br>
+                        </div>
+                  `;
+                  pendingTransactions.innerHTML += transactionHTML;
+                  window.scrollTo({
+                    top: document.body.scrollHeight + document.body.offsetTop + window.innerHeight,
+                    behavior: 'smooth'
+                  });
+                } else {
+                  console.error('Error:', xhr.status);
+                  var error = JSON.parse(xhr.responseText);
+                  var errorDiv = document.createElement('div');
+                  errorDiv.id = 'error';
+                  errorDiv.style.position = 'absolute';
+                  errorDiv.style.top = '50%';
+                  errorDiv.style.left = '50%';
+                  errorDiv.style.transform = 'translate(-50%, -50%)';
+                  errorDiv.style.backgroundColor = 'white';
+                  errorDiv.style.padding = '10px';
+                  errorDiv.style.border = '1px solid #ddd';
+                  errorDiv.style.borderRadius = '5px';
+                  errorDiv.innerHTML = `
+                    <p style="text-align: center; color: red;">${error.error}</p>
+                  `;
+                  document.body.appendChild(errorDiv);
+                }
+              };
+            });
+          });
+        });
+    </script>
+  </body>
+</html>
+

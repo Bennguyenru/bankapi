@@ -1,6 +1,6 @@
 django
 djangorestframework
-corsheaders
+django-cors-headers
 flask
 requests
 djangorestframework-simplejwt

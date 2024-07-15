@@ -7,7 +7,6 @@ import json
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'secret'
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
